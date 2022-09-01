@@ -1,34 +1,48 @@
-from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import F, Q
+from django.core.validators import MaxValueValidator, MinValueValidator
 
+from users.models import User
+from field_names import FIELDS
 
-User = get_user_model()
-
-FIELD_NAMES = {
-    'TITLE': 'Название',
-    'PUB_DATE': 'Дата публикации',
-    'COOKING_TIME': 'Время готовки',
-}
 
 class Ingredient(models.Model):
-    """Модель сообщества (группы) содержит поля:
-    - title - название сообщества;
-    - количество - уникальный url адрес страницы сообщества;
-    -  - единицы измерения;
-    - функция __str__ переопределена и показывает название сообщества title.
+    """Модель ингридиента содержит поля:
+    - title - название ингридиента;
+    - unit - единица измерения;
+    - функция __str__ переопределена и показывает название ингридиента title.
     """
     # Все поля обязательны для заполнения.
-    title = models.CharField(st.DEV_CON['GROUP_NAME'], max_length=200)
-    slug = models.SlugField(st.DEV_CON['URL_NAME'], unique=True)
-    description = models.TextField(st.DEV_CON['DESCRIPTION_NAME'])
+    title = models.CharField(FIELDS['GROUP_NAME'], max_length=200)
+    unit = models.TextField(FIELDS['UNIT_NAME'], unique=True)
 
     class Meta:
-        verbose_name = st.DEV_CON['GROUP_NAME']
-        verbose_name_plural = st.DEV_CON['GROUPS_NAME']
+        verbose_name = FIELDS['INGRIDIENT_NAME']
+        verbose_name_plural = FIELDS['INGRIDIENTS_NAME']
 
     def __str__(self):
         return(self.title)
+
+
+class Tag(models.Model):
+    """Модель тэга содержит поля:
+    - title - название тэга;
+    - color - цветовой HEX-код;
+    - slug - уникальный url адрес страницы тэга.
+    """
+    # Все поля обязательны для заполнения и уникальны.
+    title = models.CharField(FIELDS['TAG_NAME'], max_length=200, unique=True)
+    color = models.TextField(FIELDS['COLOR_NAME'], unique=True)
+    slug = models.SlugField(FIELDS['URL_NAME'], unique=True)
+
+
+    class Meta:
+        verbose_name = FIELDS['TAG_NAME']
+        verbose_name_plural = FIELDS['TAGS_NAME']
+
+    def __str__(self):
+        return(self.title)
+
 
 class Recipe(models.Model):
     """Модель сообщения содержит поля:
@@ -43,44 +57,45 @@ class Recipe(models.Model):
     """
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='recipes')
-    title = models.CharField(FIELD_NAMES['TITLE'], max_length=200)
+    title = models.CharField(FIELDS['TITLE'], max_length=200)
     image = models.ImageField(upload_to='recipes-images/')
     text = models.TextField()
-    ingredients = models.ForeignKey(Ingredient, on_delete=models.PROTECT,
-        related_name='recipes'
+    ingredients = models.ManyToManyField(
+        Ingredient,
+        through='IngredientInRecipe',
+        through_fields=('recipe', 'ingredient')
         )
-    tags = models.ForeignKey(Ingredient, null=True, on_delete=models.SET_NULL,
-        related_name='recipes'
-        )
+    tags = models.ManyToManyField(Tag, through='TagRecipe')
     cooking_time = models.PositiveSmallIntegerField(
-        FIELD_NAMES['COOKING_TIME'], null=True
-        )
-    pub_date = models.DateTimeField(FIELD_NAMES['PUB_DATE'],
+        FIELDS['COOKING_TIME'], 
+        null=True, 
+        validators=[MinValueValidator(1)]
+    )
+    pub_date = models.DateTimeField(FIELDS['PUB_DATE'],
         auto_now_add=True
-        )
+    )
 
 
-class Tag(models.Model):
-    """Модель тэга содержит поля:
-    - title - название тэга;
-    - color - цветовой HEX-код;
-    - slug - уникальный url адрес страницы сообщества.
-    """
-    # Все поля обязательны для заполнения и уникальны.
-    title = models.CharField(st.DEV_CON['GROUP_NAME'], max_length=200)
-    slug = models.SlugField(st.DEV_CON['URL_NAME'], unique=True)
-    description = models.TextField(st.DEV_CON['DESCRIPTION_NAME'])
-
-    class Meta:
-        verbose_name = st.DEV_CON['GROUP_NAME']
-        verbose_name_plural = st.DEV_CON['GROUPS_NAME']
+class IngredientInRecipe(models.Model):
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    amount = models.DecimalField(
+        max_digits=7,
+        decimal_places=3,
+        validators=[MinValueValidator(0.001)]
+    )
 
     def __str__(self):
-        return(self.title)
+        return (f'{self.recipe} {self.ingredient}'
+                f' {self.amount} {self.ingredient.unit}')
 
 
+class TagRecipe(models.Model):
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
 
-
+    def __str__(self):
+        return f'{self.tag} {self.recipe}' 
 
 
 class Follow(models.Model):
@@ -92,21 +107,21 @@ class Follow(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='follower',
-        verbose_name=st.DEV_CON['FOLLOWER_NAME']
+        verbose_name=FIELDS['FOLLOWER_NAME']
     )
 
     following = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='following',
-        verbose_name=st.DEV_CON['AUTHOR_NAME'],
+        verbose_name=FIELDS['AUTHOR_NAME'],
         null=True
     )
 
     class Meta:
         ordering = ('-following',)
-        verbose_name = st.DEV_CON['FOLLOW_NAME']
-        verbose_name_plural = st.DEV_CON['FOLLOWS_NAME']
+        verbose_name = FIELDS['FOLLOW_NAME']
+        verbose_name_plural = FIELDS['FOLLOWS_NAME']
         constraints = [
             models.CheckConstraint(check=~Q(user=F('following')),
                                    name='disable_self-following'),
@@ -116,3 +131,17 @@ class Follow(models.Model):
 
     def __str__(self):
         return(f'{self.user} => {self.following}')
+    
+
+CHOICES = (
+        ('Gray', 'Серый'),
+        ('Black', 'Чёрный'),
+        ('White', 'Белый'),
+        ('Ginger', 'Рыжий'),
+        ('Mixed', 'Смешанный'),
+    )
+
+
+
+
+
