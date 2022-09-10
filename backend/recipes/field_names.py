@@ -2,7 +2,7 @@ FIELDS = {
     # Recipe model
     'TITLE': 'Название',
     'PUB_DATE': 'Дата публикации',
-    'COOKING_TIME': 'Время готовки',
+    'COOKING_TIME': 'Время приготовления',
     # Tag model
     'TAG_NAME': 'Тэг',
     'URL_NAME': 'ссылка',
@@ -17,4 +17,33 @@ FIELDS = {
     'TAGS_NAME': 'Тэги',
     'COLOR_NAME': 'Цвет',
     'URL_NAME': 'Ссылка',
+
+    # serialaizers fields
+    'RECIPE_SERIALIZER': (
+        'author',
+        'title',
+        'image',
+        'text',
+        'ingredients',
+        'tag',
+        'cooking_time',
+        'pub_date',
+    ),
+
+    'INGREDIENT_SERIALIZER': (
+        'title',
+        'unit',
+    ),
+
+    'INGREDIENT_IN_RECIPE_SERIALIZER': (
+        'ingredient',
+        'recipe',
+        'amount',
+    ),
+
+    'TAG_SERIALIZER': (
+        'title',
+        'color',
+        'slug',
+    ),
 }
