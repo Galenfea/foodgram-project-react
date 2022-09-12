@@ -3,7 +3,7 @@ from django.db.models import F, Q
 from django.core.validators import MinValueValidator
 
 from users.models import User
-from field_names import FIELDS
+from constants.names import FIELDS
 
 
 class Ingredient(models.Model):
@@ -13,7 +13,7 @@ class Ingredient(models.Model):
     - функция __str__ переопределена и показывает название ингридиента title.
     """
     # Все поля обязательны для заполнения.
-    name = models.CharField(FIELDS['GROUP_NAME'], max_length=200)
+    name = models.CharField(FIELDS['INGRIDIENT_NAME'], max_length=200)
     measurement_unit = models.TextField(FIELDS['UNIT_NAME'], unique=True)
 
     class Meta:
@@ -32,7 +32,7 @@ class Tag(models.Model):
     """
     # Все поля обязательны для заполнения и уникальны.
     name = models.CharField(FIELDS['TAG_NAME'], max_length=200, unique=True)
-    color = models.TextField(FIELDS['COLOR_NAME'], max_length=7, unique=True)
+    color = models.CharField(FIELDS['COLOR_NAME'], max_length=7, unique=True)
     slug = models.SlugField(FIELDS['URL_NAME'], unique=True)
 
 
@@ -60,12 +60,16 @@ class Recipe(models.Model):
     name = models.CharField(FIELDS['TITLE'], max_length=200)
     image = models.ImageField(upload_to='recipes-images/')
     text = models.TextField()
-    ingredients = models.ManyToManyField(FIELDS['INGRIDIENTS_NAME'],
+    ingredients = models.ManyToManyField(
         Ingredient,
+        verbose_name=FIELDS['INGRIDIENTS_NAME'],
         through='IngredientInRecipe',
         through_fields=('recipe', 'ingredient')
         )
-    tags = models.ManyToManyField(Tag, through='TagRecipe')
+    tags = models.ManyToManyField(Tag,
+        verbose_name=FIELDS['TAGS_NAME'],
+        through='TagRecipe'
+    )
     cooking_time = models.PositiveSmallIntegerField(
         FIELDS['COOKING_TIME'], 
         validators=(MinValueValidator(1),)
@@ -117,8 +121,8 @@ class Follow(models.Model):
 
     class Meta:
         ordering = ('-following',)
-        verbose_name = FIELDS['FOLLOW_NAME']
-        verbose_name_plural = FIELDS['FOLLOWS_NAME']
+        verbose_name = FIELDS['FOLLOWER_NAME']
+        verbose_name_plural = FIELDS['FOLLOWERS_NAME']
         constraints = [
             models.CheckConstraint(check=~Q(user=F('following')),
                                    name='disable_self-following'),

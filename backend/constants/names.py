@@ -5,18 +5,18 @@ FIELDS = {
     'COOKING_TIME': 'Время приготовления',
     # Tag model
     'TAG_NAME': 'Тэг',
-    'URL_NAME': 'ссылка',
-    # Follow model
-    'AUTHOR_NAME': 'Автор',
-    'FOLLOW_NAME': 'Подписчик',
-    'FOLLOWS_NAME': 'Подписчики',
-    'UNIT_NAME': 'Ед. измерения',
-    'INGRIDIENT_NAME': 'Ингридиент',
-    'INGRIDIENTS_NAME': 'Ингридиенты',
-    'TAG_NAME': 'Тэг',
     'TAGS_NAME': 'Тэги',
     'COLOR_NAME': 'Цвет',
     'URL_NAME': 'Ссылка',
+    # Follow model
+    'AUTHOR_NAME': 'Автор',
+    'FOLLOWER_NAME': 'Подписчик',
+    'FOLLOWERS_NAME': 'Подписчики',
+    'UNIT_NAME': 'Ед. измерения',
+    'INGRIDIENT_NAME': 'Ингридиент',
+    'INGRIDIENTS_NAME': 'Ингридиенты',
+
+    'EMPTY': '-',
 
     # serialaizers fields
     'RECIPE_SERIALIZER': (

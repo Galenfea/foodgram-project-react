@@ -1,10 +1,7 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from django.conf import settings as st
-
 from recipes.models import Follow, Ingredient, IngredientInRecipe, Recipe, Tag, User
-from recipes.field_names import FIELDS
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -69,7 +66,7 @@ class FollowSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = st.SERIALIZERS_FIELDS['FollowSerializer']
+        fields = ('id', 'user', 'author',)
         model = Follow
 
         validators = [
