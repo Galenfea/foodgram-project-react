@@ -1,7 +1,6 @@
-from django.shortcuts import get_object_or_404
 from recipes.models import Follow, Ingredient, IngredientInRecipe, Recipe, Tag
 from rest_framework import filters, permissions, viewsets
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.pagination import PageNumberPagination
 
 from .mixins import CreateListViewSet
 from .permissions import OnlyAuthorEditOrReadOnlyPremission
@@ -13,7 +12,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     # permission_classes = (OnlyAuthorEditOrReadOnlyPremission,)
-    pagination_class = LimitOffsetPagination
+    pagination_class = PageNumberPagination
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -23,14 +22,12 @@ class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     # permission_classes = (OnlyAuthorEditOrReadOnlyPremission,)
-    pagination_class = LimitOffsetPagination
 
 
-class IngredientViewSet(viewsets.ModelViewSet):
+class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     # permission_classes = (OnlyAuthorEditOrReadOnlyPremission,)
-    pagination_class = LimitOffsetPagination
 
 
 # class CommentViewSet(viewsets.ModelViewSet):

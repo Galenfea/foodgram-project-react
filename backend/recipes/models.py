@@ -1,3 +1,4 @@
+from colorfield.fields import ColorField
 from django.db import models
 from django.db.models import F, Q
 from django.core.validators import MinValueValidator
@@ -14,7 +15,7 @@ class Ingredient(models.Model):
     """
     # Все поля обязательны для заполнения.
     name = models.CharField(FIELDS['INGRIDIENT_NAME'], max_length=200)
-    measurement_unit = models.TextField(FIELDS['UNIT_NAME'], unique=True)
+    measurement_unit = models.CharField(FIELDS['UNIT_NAME'], max_length=200)
 
     class Meta:
         verbose_name = FIELDS['INGRIDIENT_NAME']
@@ -32,7 +33,11 @@ class Tag(models.Model):
     """
     # Все поля обязательны для заполнения и уникальны.
     name = models.CharField(FIELDS['TAG_NAME'], max_length=200, unique=True)
-    color = models.CharField(FIELDS['COLOR_NAME'], max_length=7, unique=True)
+    color = ColorField(
+        FIELDS['COLOR_NAME'],
+        default='#FF0000',
+        max_length=7, unique=True
+        )
     slug = models.SlugField(FIELDS['URL_NAME'], unique=True)
 
 
@@ -45,7 +50,7 @@ class Tag(models.Model):
 
 
 class Recipe(models.Model):
-    """Модель сообщения содержит поля:
+    """Модель рецепта содержит поля:
     - author - автор (при удалении автора удаляются все рецепты);
     - title - название рецепта;
     - image - загружаемая картинка;
@@ -77,6 +82,10 @@ class Recipe(models.Model):
     pub_date = models.DateTimeField(FIELDS['PUB_DATE'],
         auto_now_add=True
     )
+
+    class Meta:
+        verbose_name = FIELDS['RECIPE_NAME']
+        verbose_name_plural = FIELDS['RECIPES_NAME']
 
 
 class IngredientInRecipe(models.Model):
@@ -132,8 +141,5 @@ class Follow(models.Model):
 
     def __str__(self):
         return(f'{self.user} => {self.following}')
-
-
-
 
 

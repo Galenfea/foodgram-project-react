@@ -132,3 +132,5 @@ dmypy.json
 .idea
 1test.py
 requests.http
+backend/static
+backend/media/*

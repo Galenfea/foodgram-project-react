@@ -1,5 +1,7 @@
 FIELDS = {
     # Recipe model
+    'RECIPE_NAME': 'Рецепт',
+    'RECIPES_NAME': 'Рецепты',
     'TITLE': 'Название',
     'PUB_DATE': 'Дата публикации',
     'COOKING_TIME': 'Время приготовления',
