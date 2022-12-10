@@ -143,10 +143,6 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         max_length=None,
         use_url=True
     )
-    # tags = TagRecipeSerializer(
-    #     many=True
-    #     # queryset=Tag.objects.all()
-    # )
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         many=True
@@ -179,21 +175,39 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         test_generator = [
             print(f'СЛОВАРЬ: {ingredient}') for ingredient in ingredients
         ]
-        bulk_ingredients_generator = [
+        bulk_ingredients = [
             IngredientInRecipe(
                 recipe=recipe,
                 ingredient=ingredient['id'],
                 amount=ingredient['amount']
             ) for ingredient in ingredients
         ]
-        print(f'bulk {bulk_ingredients_generator}')
+        print(f'bulk {bulk_ingredients}')
         print(f'tags {tags}')
         recipe.tags.set(tags)
-        IngredientInRecipe.objects.bulk_create(bulk_ingredients_generator)
+        IngredientInRecipe.objects.bulk_create(bulk_ingredients)
         print('CREATE END')
         return recipe
 
 
+    def update(self, instance, validated_data):
+        '''Перезапиши все поля модели рецепта.'''
+        ingredients = validated_data.pop('ingredients', None)
+        tags = validated_data.pop('tags', None)
+        if ingredients is not None:
+            instance.ingredients.clear()
+        if tags is not None:
+            instance.tags.set(tags)
+
+        bulk_ingredients= [
+            IngredientInRecipe(
+                recipe=instance,
+                ingredient=ingredient['id'],
+                amount=ingredient['amount']
+            ) for ingredient in ingredients
+        ]            
+        IngredientInRecipe.objects.bulk_create(bulk_ingredients)
+        return super().update(instance, validated_data)
 
 
 
