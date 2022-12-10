@@ -1,8 +1,9 @@
-from constants.names import FIELDS
+# from constants.names import FIELDS
+from core.names import FIELDS
 from django.contrib import admin
 
-from .models import (Follow, Ingredient, IngredientInRecipe, Recipe, Tag,
-                     TagRecipe)
+from .models import (Favorite, Follow, Ingredient, IngredientInRecipe,
+                     Recipe, ShoppingCart, Tag, TagRecipe)
 
 
 @admin.register(Ingredient)
@@ -53,7 +54,7 @@ class RecipeAdmin(admin.ModelAdmin):
     exclude = ('ingredients', 'tags',)
     list_display = ('pk', 'author', 'name', 'image', 'text', 'cooking_time', 'pub_date',
                     )
-    list_editable = ('author', 'name', 'image', 'text', 'cooking_time',
+    list_editable = ('author', 'name', 'text', 'cooking_time',
                      )
     search_fields = ('author', 'name', 'tags', 'cooking_time',)
     list_filter = ('name',)
@@ -101,6 +102,32 @@ class FollowAdmin(admin.ModelAdmin):
     - удалять подписку;
     - проводить поиск по авторам и подписчикам;
     - выводить "-пусто-" в полях со значением None."""
-    list_display = ('pk', 'following', 'user',)
-    search_fields = ('following', 'user',)
+    list_display = ('pk', 'author', 'user',)
+    search_fields = ('author', 'user',)
+    empty_value_display = FIELDS['EMPTY']
+
+
+@admin.register(Favorite)
+class FavoriteAdmin(admin.ModelAdmin):
+    """Источник конфигурации модели Favorites, регистрируемой в админке, позволяет:
+    - отображать в админке первичный ключ, подписчика и
+    автора, на которого происходит подписка;
+    - удалять подписку;
+    - проводить поиск по авторам и подписчикам;
+    - выводить "-пусто-" в полях со значением None."""
+    list_display = ('pk', 'user', 'recipe',)
+    search_fields = ('user', 'recipe',)
+    empty_value_display = FIELDS['EMPTY']
+
+
+@admin.register(ShoppingCart)
+class ShoppingCartAdmin(admin.ModelAdmin):
+    """Источник конфигурации модели ShoppingCart, регистрируемой в админке, позволяет:
+    - отображать в админке первичный ключ, покупателя и рецепты
+    для списка покупок;
+    - удалять рецепт;
+    - проводить поиск по покупателям и рецептам;
+    - выводить "-пусто-" в полях со значением None."""
+    list_display = ('pk', 'user', 'recipe',)
+    search_fields = ('user', 'recipe',)
     empty_value_display = FIELDS['EMPTY']
