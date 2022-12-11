@@ -11,6 +11,7 @@ FIELDS = {
     'TAG_NAME': 'Тэг',
     'TAGS_NAME': 'Тэги',
     'COLOR_NAME': 'Цвет',
+    'COLOR_DEFAULT': '#FF0000',
     'URL_NAME': 'Ссылка',
     # Follow model
     'AUTHOR_NAME': 'Автор',

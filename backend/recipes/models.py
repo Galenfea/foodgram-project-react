@@ -43,7 +43,7 @@ class Tag(models.Model):
     )
     color = ColorField(
         FIELDS['COLOR_NAME'],
-        default='#FF0000',
+        default=FIELDS['COLOR_DEFAULT'],
         max_length=7, unique=True
     )
     slug = models.SlugField(
@@ -156,7 +156,7 @@ class TagRecipe(models.Model):
 class Follow(models.Model):
     """Модель подписки содержит поля:
     - user - подписчик;
-    - subscribed - автор интересующий подписчика;
+    - author - автор интересующий подписчика;
     - функция __str__ переопределена.
     """
     user = models.ForeignKey(

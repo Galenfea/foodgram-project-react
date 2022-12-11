@@ -133,6 +133,21 @@ class RecipeGetSerializer(serializers.ModelSerializer):
         return self._filter_current_user_value(obj=obj, model=ShoppingCart)
 
 
+class RecipeFavoriteCartSerializer(serializers.ModelSerializer):
+    image = Base64ImageField(
+        max_length=None,
+        use_url=True
+    )
+
+    class Meta:
+        model = Recipe
+        fields = (
+            'id',
+            'name',
+            'image',
+            'cooking_time',
+        )
+
 
 class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(required=False)

@@ -1,20 +1,22 @@
 from recipes.models import Favorite, Follow, Ingredient, IngredientInRecipe, Recipe, ShoppingCart, Tag, User
-from rest_framework import filters, permissions, viewsets
+from rest_framework import filters, permissions, viewsets, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS
+from rest_framework.response import Response
 
 from djoser.views import UserViewSet as DjoserUserViewSet
 
-from .mixins import CreateListViewSet, CreateRetriveDeleteViewSet
+from .mixins import CreateListViewSet, CreateRetriveDeleteViewSet, CreateDeleteMixin
 from .permissions import OnlyAuthorEditOrReadOnlyPremission
 from .serializers import (
     FollowSerializer,
     IngredientSerializer,
     RecipeGetSerializer,
     RecipeCreateUpdateSerializer,
+    RecipeFavoriteCartSerializer,
     FavoriteSerializer,
     TagSerializer,
     CustomUserSerializer
@@ -22,7 +24,7 @@ from .serializers import (
 from .filters import RecipeFilter
 
 
-class RecipeViewSet(viewsets.ModelViewSet):
+class RecipeViewSet(viewsets.ModelViewSet, CreateDeleteMixin):
     queryset = Recipe.objects.all()
     serializer_class = RecipeGetSerializer
     # permission_classes = (IsAdminOrAuthorOrReadOnly,)
@@ -31,22 +33,42 @@ class RecipeViewSet(viewsets.ModelViewSet):
     # http_method_names = ['get', 'post', 'patch', 'delete', 'options', 'headers']
 
     def get_serializer_class(self):
+        if (self.action == 'favorite' or
+            self.action == 'shopping_cart'):
+            serializer = RecipeFavoriteCartSerializer
+        if (self.action == 'create' or
+            self.action == 'delete' or
+            self.action == 'patch'
+            ):
+            serializer = RecipeCreateUpdateSerializer
         if self.request.method in SAFE_METHODS:
-            print('ACTION GET RECIPE')
-            return RecipeGetSerializer
-        print('ACTION = CREATE RECIPE')
-        return RecipeCreateUpdateSerializer
-
-#    def get_serializer_class(self):
-#        if self.action == 'create':
-#            print('ACTION = CREATE')
-#            return RecipeCreateUpdateSerializer
-#        print('ACTION =/= post')
-#        return RecipeGetSerializer 
+            serializer = RecipeGetSerializer
+        print('SERIALIZER = ', serializer)
+        return serializer
 
     def perform_create(self, serializer):
         print('PERFORM CREATE')
         serializer.save(author=self.request.user)
+
+    @action(detail=True, methods=['post', 'delete'])
+    def favorite(self, request, pk=None):
+        """Добавление/удаление рецептов в избранном."""
+        return self.create_delete(
+            request=request,
+            model=Favorite, 
+            field='recipe',
+            pk=pk
+        )
+
+    @action(detail=True, methods=['post', 'delete'])
+    def shopping_cart(self, request, pk=None):
+        """Добавление/удаление рецептов в корзину."""
+        return self.create_delete(
+            request=request,
+            model=ShoppingCart, 
+            field='recipe',
+            pk=pk
+        )
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -59,22 +81,6 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     # permission_classes = (OnlyAuthorEditOrReadOnlyPremission,)
-
-
-# class CommentViewSet(viewsets.ModelViewSet):
-#     serializer_class = CommentSerializer
-#     permission_classes = (OnlyAuthorEditOrReadOnlyPremission,)
-#     pagination_class = LimitOffsetPagination
-# 
-#     def perform_create(self, serializer):
-#         post_id = self.kwargs.get('post_id')
-#         post = Post.objects.get(id=post_id)
-#         serializer.save(author=self.request.user, post=post)
-# 
-#     def get_queryset(self):
-#         post_id = self.kwargs.get('post_id')
-#         post = get_object_or_404(Post, id=post_id)
-#         return Comment.objects.filter(post=post)
 
 
 class FollowViewSet(CreateRetriveDeleteViewSet):
