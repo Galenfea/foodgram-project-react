@@ -30,7 +30,7 @@ class CreateDeleteMixin:
         kwargs = {'user': user, field: object}
         if request.method == 'POST':
             try:
-                new_object = model.objects.create(**kwargs)
+                model.objects.create(**kwargs)
             except:
                 raise ValidationError('Объект уже создан')
             # Методы будут доступны в классе, наследуемом от ModelViewSet
@@ -39,14 +39,12 @@ class CreateDeleteMixin:
 
             context = self.get_serializer_context()
             serializer=serializer_class(object, context=context) 
-
-            # print('САМ СЕРИАЛАЙЗЕР: ', serializer)
             print('DATA СЕРИАЛАЙЗЕР: ', serializer.data)
             response = Response(data=serializer.data, status=status.HTTP_201_CREATED)
             # print('SERIALIZER CONTEXT: ', context)
             # serializer.is_valid(raise_exception=True)
             # serializer.save()
-            # return Response(serializer.data, status=status.HTTP_201_CREATED)
+            # return Response(serializer.data, status=status.HTTP_201_CREATED)       
 
         if request.method == 'DELETE':
             try:

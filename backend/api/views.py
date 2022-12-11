@@ -6,18 +6,17 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS
 from rest_framework.response import Response
-
+from rest_framework import mixins
 from djoser.views import UserViewSet as DjoserUserViewSet
 
 from .mixins import CreateListViewSet, CreateRetriveDeleteViewSet, CreateDeleteMixin
 from .permissions import OnlyAuthorEditOrReadOnlyPremission
 from .serializers import (
-    FollowSerializer,
     IngredientSerializer,
     RecipeGetSerializer,
     RecipeCreateUpdateSerializer,
     RecipeFavoriteCartSerializer,
-    FavoriteSerializer,
+    SubscriptionsSerializer,
     TagSerializer,
     CustomUserSerializer
     )
@@ -83,32 +82,6 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     # permission_classes = (OnlyAuthorEditOrReadOnlyPremission,)
 
 
-class FollowViewSet(CreateRetriveDeleteViewSet):
-    serializer_class = FollowSerializer
-    permission_classes = (permissions.IsAuthenticated,)
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('=following__username',)
-
-    def get_queryset(self):
-        return Follow.objects.filter(user=self.request.user)
-
-    def perform_create(self, serializer):
-        serializer.save()
-
-
-class FavoriteViewSet(CreateListViewSet):
-    serializer_class = FavoriteSerializer
-    permission_classes = (permissions.IsAuthenticated,)
-    filter_backends = (filters.SearchFilter,)
-
-    def get_queryset(self):
-        # user_id = self.kwargs.get('user_id')
-        return Favorite.objects.filter(user=self.request.user)
-
-    def perform_create(self, serializer):
-        serializer.save()
-
-
 def download_shopping_cart(self, request):
         """Скачать список покупок."""
         user = self.request.user
@@ -131,53 +104,38 @@ def download_shopping_cart(self, request):
         return response
 
 
-class UserViewSet(DjoserUserViewSet):
+class UserViewSet(DjoserUserViewSet, CreateDeleteMixin):
     queryset = User.objects.all()
     pagination_class = PageNumberPagination
     # permission_classes = (IsOwnerOrAdminOrReadOnly,)
     serializer_class = CustomUserSerializer
 
-    # def get_serializer_class(self):
-    #     if self.request.method is 'POST':
-    #         return CustomUserCreateSerializer
-    #     return super().get_serializer_class()
+    def get_serializer_class(self):
+        if (self.action == 'subscribe' or
+            self.action == 'subscriptions'):
+            return SubscriptionsSerializer
+        return super().get_serializer_class()
 
-    @action(detail=True)     #, permission_classes=[IsAuthenticated]
+
+    @action(detail=True, methods=['post', 'delete'])
     def subscribe(self, request, id=None):
-        user = request.user
-        author = get_object_or_404(User, id=id)
-
-        data = {
-            'user': user.id,
-            'author': author.id,
-        }
-        serializer = FollowSerializer(
-            data=data, context={'request': request}
+        """Добавление/удаление подписок пользователя."""
+        return self.create_delete(
+            request=request,
+            model=Follow, 
+            field='author',
+            pk=id
         )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    @subscribe.mapping.delete
-    def delete_subscribe(self, request, id=None):
+    @action(detail=False)     #, permission_classes=[IsAuthenticated]
+    def subscriptions(self, request):
         user = request.user
-        author = get_object_or_404(User, id=id)
-        subscribe = get_object_or_404(
-            Follow, user=user, author=author
-        )
-        subscribe.delete()
-
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    # @action(detail=False, permission_classes=[IsAuthenticated])
-    # def subscriptions(self, request):
-    #     user = request.user
-    #     queryset = Follow.objects.filter(user=user)
-    #     pages = self.paginate_queryset(queryset)
-    #     serializer = FollowerSerializer(
-    #         pages,
-    #         many=True,
-    #         context={'request': request}
-    #     )
-    #     return self.get_paginated_response(serializer.data)
+        queryset = User.objects.filter(authors__user=user)
+        pages = self.paginate_queryset(queryset)
+        serializer = SubscriptionsSerializer(
+            many=True,
+            instance=pages,
+            context={'request': request}
+            )
+        print('SERIALIZER: ', serializer.data)
+        return self.get_paginated_response(serializer.data)

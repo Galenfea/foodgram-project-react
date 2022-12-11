@@ -100,7 +100,7 @@ class RecipeGetSerializer(serializers.ModelSerializer):
         many=True,
         read_only=True,
     )
-    # TODO В будущем реализовать через аннотацию во вьюсете,
+    # TODO В будущем реализовать через аннотацию,
     # чтобы не лезть по два раза в базу на каждом рецепте.
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
@@ -135,7 +135,6 @@ class RecipeGetSerializer(serializers.ModelSerializer):
 
 class RecipeFavoriteCartSerializer(serializers.ModelSerializer):
     image = Base64ImageField(
-        max_length=None,
         use_url=True
     )
 
@@ -225,52 +224,21 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
-
-class FollowSerializer(serializers.ModelSerializer):
-    subscribed = serializers.SlugRelatedField(
-        slug_field='username',
-        queryset=User.objects.all(),
-        source = 'user',
-    )
-
-    user = serializers.SlugRelatedField(
-        slug_field='username',
-        default=serializers.CurrentUserDefault(),
-        queryset=User.objects.all(),
-        source = 'author',
-    )
+class SubscriptionsSerializer(CustomUserSerializer):
+    recipes = RecipeFavoriteCartSerializer(many=True)
+    recipes_count = serializers.SerializerMethodField()
 
     class Meta:
-        fields = ('id', 'user', 'subscribed',)
-        model = Follow
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name', 
+            'is_subscribed',
+            'recipes', 
+            'recipes_count',)
+        model = User
 
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Follow.objects.all(),
-                fields=('user', 'subscribed')
-            )
-        ]
-
-    def validate(self, data):
-        if data['subscribed'] == self.context['request'].user:
-            raise serializers.ValidationError('Нельзя подписаться на себя!')
-        return data
-
-
-class FavoriteSerializer(serializers.ModelSerializer):
-    user = serializers.SlugField(
-    )
-
-    recipe = serializers.SlugField(
-    )
-
-    class Meta:
-        fields = ('id', 'user', 'recipe',)
-        model = Favorite
-
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Favorite.objects.all(),
-                fields=('user', 'recipe')
-            )
-        ]
+    def get_recipes_count(self, obj):
+        return Recipe.objects.filter(author=obj).count()
