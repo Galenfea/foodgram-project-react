@@ -69,8 +69,12 @@ class IngredientInRecipeSerializerCreate(serializers.ModelSerializer):
         fields = ('id', 'amount', 'recipe')
 
     def validate(self, data):
-        print('DATADATA: ', data)
-        return super().validate(data)
+        amount = data.get('amount')
+        if int(amount) <= 0:
+            raise ValidationError(
+                ERRORS['RECIPE_AMOUNT_VALID']
+            )
+        return data
 
 class TagSerializer(serializers.ModelSerializer):
 
@@ -187,28 +191,6 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
             'cooking_time',
         )
 
-    def validate(self, data):
-        ingredients = data.get('ingredients')
-        print(ingredients)
-        if not ingredients:
-            raise serializers.ValidationError(
-                ERRORS['RECIPE_ZERO_INGRIDIENT_VALID']
-            )
-        ingredients_unic = set()
-        for ingredient in ingredients:
-            if int(ingredient['amount']) <= 0:
-                raise ValidationError(
-                    ERRORS['RECIPE_AMOUNT_VALID']
-                )
-            if ingredient['id'] in ingredients_unic:
-                    raise serializers.ValidationError(
-                        ERRORS['RECIPE_UNIC_INGREDIENT_VALID']
-                    )
-            ingredients_unic.add(ingredient['id'])
-            data['ingredients'] = ingredients
-            return data
-
-
     @transaction.atomic
     def create(self, validated_data):
         print('CREATE BEGIN')
@@ -256,6 +238,22 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         ]            
         IngredientInRecipe.objects.bulk_create(bulk_ingredients)
         return super().update(instance, validated_data)
+
+    def validate(self, data):
+        print('RECIPE VALID: ', data)
+        ingredients = data.get('ingredients')
+        if not ingredients:
+            raise serializers.ValidationError(
+                ERRORS['RECIPE_ZERO_INGRIDIENT_VALID']
+            )
+        ingredients_unic = set()
+        for ingredient in ingredients:
+            if ingredient['id'] in ingredients_unic:
+                    raise serializers.ValidationError(
+                        ERRORS['RECIPE_UNIC_INGREDIENT_VALID']
+                    )
+            ingredients_unic.add(ingredient['id'])
+        return data
 
 
 class SubscriptionsSerializer(CustomUserSerializer):
