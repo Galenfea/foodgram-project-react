@@ -1,9 +1,10 @@
 from colorfield.fields import ColorField
-from django.db import models
-from django.db.models import F, Q
+
 from django.core.validators import MinValueValidator
-from users.models import User
+from django.db import models
+
 from core.names import FIELDS
+from users.models import User
 
 
 class Ingredient(models.Model):
@@ -153,42 +154,6 @@ class TagRecipe(models.Model):
         return f'{self.tag} {self.recipe}' 
 
 
-class Follow(models.Model):
-    """Модель подписки содержит поля:
-    - user - подписчик;
-    - author - автор интересующий подписчика;
-    - функция __str__ переопределена.
-    """
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='followers',
-        verbose_name=FIELDS['FOLLOWER_NAME']
-    )
-
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='authors',
-        verbose_name=FIELDS['AUTHOR_NAME'],
-        null=True
-    )
-
-    class Meta:
-        ordering = ('-author',)
-        verbose_name = FIELDS['FOLLOWER_NAME']
-        verbose_name_plural = FIELDS['FOLLOWERS_NAME']
-        constraints = [
-            models.CheckConstraint(check=~Q(user=F('author')),
-                                   name='disable_self-folowing'),
-            models.UniqueConstraint(fields=('user', 'author'),
-                                    name='unique_folowing')
-        ]
-
-    def __str__(self):
-        return(f'{self.user} => {self.author}')
-
-
 class Favorite(models.Model):
     '''Модель избранных рецептов содержит поля:
     - user - пользователь добавивший в избранное рецепт;
@@ -237,7 +202,7 @@ class ShoppingCart(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='recipes',
+        related_name='in_shopping_cart',
         verbose_name=FIELDS['RECIPE_NAME'],
     )
 

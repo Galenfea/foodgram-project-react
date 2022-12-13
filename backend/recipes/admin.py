@@ -1,9 +1,9 @@
-# from constants.names import FIELDS
-from core.names import FIELDS
 from django.contrib import admin
+from django.db.models import Count
 
-from .models import (Favorite, Follow, Ingredient, IngredientInRecipe,
-                     Recipe, ShoppingCart, Tag, TagRecipe)
+from core.names import FIELDS
+from .models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
+                     ShoppingCart, Tag, TagRecipe)
 
 
 @admin.register(Ingredient)
@@ -52,59 +52,17 @@ class RecipeAdmin(admin.ModelAdmin):
     - выводить "-пусто-" в полях со значением None."""
     inlines = (IngredientInRecipeInline, TagRecipeInline,)
     exclude = ('ingredients', 'tags',)
-    list_display = ('pk', 'author', 'name', 'image', 'text', 'cooking_time', 'pub_date',
-                    )
-    list_editable = ('author', 'name', 'text', 'cooking_time',
-                     )
+    list_display = ('pk', 'author', 'name',
+        'in_favorites',
+    )
+    list_editable = ('author', 'name',)
+    list_filter = ('author', 'name',)
     search_fields = ('author', 'name', 'tags', 'cooking_time',)
-    list_filter = ('name',)
     empty_value_display = FIELDS['EMPTY']
 
-
-# @admin.register(IngredientInRecipe)
-# class IngredientInRecipeAdmin(admin.ModelAdmin):
-#     """Источник конфигурации модели IngredientInRecipe, позволяет:
-#     - отображать в админке первичный ключ, ингредиент, рецепт  и количество
-#     ингредиента в рецепте;
-#     - редактировать все поля, кроме первичного ключа;
-#     - проводить поиск по игредиенту и руцепту;
-#     - выводить "-пусто-" в полях со значением None."""
-#     list_display = ('pk', 'ingredient', 'recipe', 'amount',)
-#     list_editable = ('ingredient', 'recipe', 'amount',)
-#     search_fields = ('ingredient', 'recipe',)
-#     list_filter = ('ingredient', 'recipe',)
-#     empty_value_display = FIELDS['EMPTY']
-
-
-
-
-# @admin.register(TagRecipe)
-# class TagRecipe(admin.ModelAdmin):
-#     """Источник конфигурации модели TagRecipe, позволяет:
-#     - отображать в админке первичный ключ, id тэга и рецепта;
-#     - редактировать рецепт и тэг;
-#     - проводить поиск по тэгу;
-#     - выводить "-пусто-" в полях со значением None."""
-#     list_display = ('pk', 'tag', 'recipe',)
-#     list_editable = ('tag', 'recipe',)
-#     search_fields = ('tag', 'recipe',)
-#     list_filter = ('tag', 'recipe',)
-#     empty_value_display = FIELDS['EMPTY']
-
-
-
-
-@admin.register(Follow)
-class FollowAdmin(admin.ModelAdmin):
-    """Источник конфигурации модели Follow, регистрируемой в админке, позволяет:
-    - отображать в админке первичный ключ, подписчика и
-    автора, на которого происходит подписка;
-    - удалять подписку;
-    - проводить поиск по авторам и подписчикам;
-    - выводить "-пусто-" в полях со значением None."""
-    list_display = ('pk', 'author', 'user',)
-    search_fields = ('author', 'user',)
-    empty_value_display = FIELDS['EMPTY']
+    def in_favorites(self, obj):
+        result = Favorite.objects.filter(recipe=obj).aggregate(Count('user'))
+        return result["user__count"]
 
 
 @admin.register(Favorite)

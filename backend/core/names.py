@@ -27,8 +27,8 @@ FIELDS = {
     'FAN_NAME': 'Любитель',
     'FAVORITES_NAME': 'Избранное',
     # ShoppingCart
-    'CART_NAME': 'Пункт в списке покупок',
-    'CARTS_NAME': 'Пункты в списке покупок',
+    'CART_NAME': 'Рецепт в списке покупок',
+    'CARTS_NAME': 'Рецепты в списке покупок',
     'BUYER': 'Покупатель',
     # Users
     'USER_NAME': 'Пользователь',
