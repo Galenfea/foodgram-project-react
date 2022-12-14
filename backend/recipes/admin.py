@@ -56,7 +56,7 @@ class RecipeAdmin(admin.ModelAdmin):
     list_display = ('pk', 'author', 'name', 'in_favorites',)
     list_editable = ('author', 'name',)
     list_filter = ('tags', 'author', 'name',)
-    search_fields = ('id', 'author', 'name', 'tags', 'cooking_time',)
+    search_fields = ('pk', 'author', 'name', 'tags', 'cooking_time',)
     empty_value_display = FIELDS['EMPTY']
 
     def in_favorites(self, obj):
@@ -87,4 +87,33 @@ class ShoppingCartAdmin(admin.ModelAdmin):
     - выводить "-пусто-" в полях со значением None."""
     list_display = ('pk', 'user', 'recipe',)
     search_fields = ('user', 'recipe',)
+    empty_value_display = FIELDS['EMPTY']
+
+
+@admin.register(IngredientInRecipe)
+class IngredientInRecipeAdmin(admin.ModelAdmin):
+    """Источник конфигурации модели IngredientInRecipe, позволяет:
+    - отображать в админке первичный ключ, ингредиент, рецепт  и количество
+    ингредиента в рецепте;
+    - редактировать все поля, кроме первичного ключа;
+    - проводить поиск по игредиенту и руцепту;
+    - выводить "-пусто-" в полях со значением None."""
+    list_display = ('pk', 'ingredient', 'recipe', 'amount',)
+    list_editable = ('ingredient', 'recipe', 'amount',)
+    search_fields = ('ingredient', 'recipe',)
+    list_filter = ('ingredient', 'recipe',)
+    empty_value_display = FIELDS['EMPTY']
+
+
+@admin.register(TagRecipe)
+class TagRecipe(admin.ModelAdmin):
+    """Источник конфигурации модели TagRecipe, позволяет:
+    - отображать в админке первичный ключ, id тэга и рецепта;
+    - редактировать рецепт и тэг;
+    - проводить поиск по тэгу;
+    - выводить "-пусто-" в полях со значением None."""
+    list_display = ('pk', 'tag', 'recipe',)
+    list_editable = ('tag', 'recipe',)
+    search_fields = ('tag', 'recipe',)
+    list_filter = ('tag', 'recipe',)
     empty_value_display = FIELDS['EMPTY']

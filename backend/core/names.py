@@ -13,6 +13,8 @@ FIELDS = {
     'COLOR_NAME': 'Цвет',
     'COLOR_DEFAULT': '#FF0000',
     'URL_NAME': 'Ссылка',
+    'TAG_RECIPE_NAME': 'Тэг в рецептах',
+    'TAGS_RECIPE_NAMES': 'Тэги в рецептах',
     # Follow model
     'AUTHOR_NAME': 'Автор',
     'FOLLOWER_NAME': 'Подписчик',
@@ -21,8 +23,8 @@ FIELDS = {
     'INGRIDIENT_NAME': 'Ингридиент',
     'INGRIDIENTS_NAME': 'Ингридиенты',
     # IngredientInRecipe
-    'INGREDIENT_IN_RECIPE_NAME': 'Ингредиент рецепта',
-    'INGREDIENT_IN_RECIPE_NAMES': 'Ингредиенты рецепта',
+    'INGREDIENT_IN_RECIPE_NAME': 'Ингредиент рецептах',
+    'INGREDIENT_IN_RECIPE_NAMES': 'Ингредиенты рецептах',
     # Favorite
     'FAN_NAME': 'Любитель',
     'FAVORITES_NAME': 'Избранное',

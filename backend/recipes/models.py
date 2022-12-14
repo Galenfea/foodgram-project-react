@@ -149,6 +149,16 @@ class TagRecipe(models.Model):
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
 
+    class Meta:
+        verbose_name = FIELDS['TAG_RECIPE_NAME']
+        verbose_name_plural = FIELDS['TAGS_RECIPE_NAMES']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'tag'],
+                name='unique_tag_in_recipe'
+            )
+        ]
+
     def __str__(self):
         return f'{self.tag} {self.recipe}'
 
