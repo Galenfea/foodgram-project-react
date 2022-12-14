@@ -1,5 +1,13 @@
+
+# ВНИМАНИЕ
+В проекте присутствует библиотека django-cors-headers
+Она активна для удобства проверки проекта на локальной машине.
+На этапе создания инфраструктуры она будет удалена.
+
+В данный момент проект использует sqlite. 
+На инфраструктурном этапе субд будет заменена на PostgreSQL.
+
 # FOODGRAM
-![Foodgram-app_workflow](https://github.com/Galenfea/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)
 Web-приложение позволяет постить и просматривать рецепты, формировать список покупок из ингридиентов в составе рецептов.
 
 ## Установка проекта
@@ -27,6 +35,11 @@ python -m pip install --upgrade pip
 - Установить зависимости:
 ```
 pip install -r requirements.txt
+```
+
+- Перейти в папку джанго сервера:
+```
+cd backend
 ```
 
 - Выполнить миграции:
