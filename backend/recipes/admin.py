@@ -16,7 +16,7 @@ class IngredientAdmin(admin.ModelAdmin):
     - выводить "-пусто-" в полях со значением None."""
     list_display = ('pk', 'name', 'measurement_unit',)
     list_editable = ('name', 'measurement_unit',)
-    search_fields = ('name',)
+    search_fields = ('id', 'name',)
     list_filter = ('name',)
     empty_value_display = FIELDS['EMPTY']
 
@@ -42,22 +42,21 @@ class IngredientInRecipeInline(admin.TabularInline):
 class TagRecipeInline(admin.TabularInline):
     model = Recipe.tags.through
 
+
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     """Источник конфигурации модели Recipe, позволяет:
-    - отображать в админке первичный ключ, автора, название, картинку, 
+    - отображать в админке первичный ключ, автора, название, картинку,
     текст, время приготовления и дату публикации рецепта;
     - редактировать всё, кроме первичного ключа;
     - проводить поиск по автору, названию, тэгам, времени приготовления;
     - выводить "-пусто-" в полях со значением None."""
     inlines = (IngredientInRecipeInline, TagRecipeInline,)
     exclude = ('ingredients', 'tags',)
-    list_display = ('pk', 'author', 'name',
-        'in_favorites',
-    )
+    list_display = ('pk', 'author', 'name', 'in_favorites',)
     list_editable = ('author', 'name',)
-    list_filter = ('author', 'name',)
-    search_fields = ('author', 'name', 'tags', 'cooking_time',)
+    list_filter = ('tags', 'author', 'name',)
+    search_fields = ('id', 'author', 'name', 'tags', 'cooking_time',)
     empty_value_display = FIELDS['EMPTY']
 
     def in_favorites(self, obj):
@@ -67,7 +66,7 @@ class RecipeAdmin(admin.ModelAdmin):
 
 @admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
-    """Источник конфигурации модели Favorites, регистрируемой в админке, позволяет:
+    """Источник конфигурации модели Favorites, позволяет:
     - отображать в админке первичный ключ, подписчика и
     автора, на которого происходит подписка;
     - удалять подписку;
@@ -80,7 +79,7 @@ class FavoriteAdmin(admin.ModelAdmin):
 
 @admin.register(ShoppingCart)
 class ShoppingCartAdmin(admin.ModelAdmin):
-    """Источник конфигурации модели ShoppingCart, регистрируемой в админке, позволяет:
+    """Источник конфигурации модели ShoppingCart, позволяет:
     - отображать в админке первичный ключ, покупателя и рецепты
     для списка покупок;
     - удалять рецепт;

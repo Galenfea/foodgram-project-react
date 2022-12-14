@@ -24,11 +24,15 @@ class CustomUserCreateSerializer(UserCreateSerializer):
             )
         return value
 
+
 class CustomUserSerializer(UserSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
-        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed',)
+        fields = ('email', 'id', 'username',
+                  'first_name', 'last_name',
+                  'is_subscribed',
+                  )
         model = User
 
     def get_is_subscribed(self, obj):
@@ -76,6 +80,7 @@ class IngredientInRecipeSerializerCreate(serializers.ModelSerializer):
             )
         return data
 
+
 class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -89,6 +94,7 @@ class TagRecipeSerializer(serializers.ModelSerializer):
         queryset=TagRecipe.objects.all(),
         source='tag'
     )
+
     class Meta:
         model = TagRecipe
         fields = ('recipe', 'tag',)
@@ -193,18 +199,11 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        print('CREATE BEGIN')
-        # получаем список словарей с ингредиентами и их количеством
+        # получаю список словарей с ингредиентами и их количеством
         ingredients = validated_data.pop('ingredients')
-        print(f'INGREDIENTS: {ingredients}')
         tags = validated_data.pop('tags')
-        print(f'TAGS: {tags}')
-        print(f'VALIDATED_DATA: {validated_data}')
         recipe = Recipe.objects.create(**validated_data)
-        # итерируемый объект
-        test_generator = [
-            print(f'СЛОВАРЬ: {ingredient}') for ingredient in ingredients
-        ]
+        # создаю связку между рецептом и ингредиентами
         bulk_ingredients = [
             IngredientInRecipe(
                 recipe=recipe,
@@ -212,11 +211,9 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
                 amount=ingredient['amount']
             ) for ingredient in ingredients
         ]
-        print(f'bulk {bulk_ingredients}')
-        print(f'tags {tags}')
-        recipe.tags.set(tags)
         IngredientInRecipe.objects.bulk_create(bulk_ingredients)
-        print('CREATE END')
+        # добавляю тэги
+        recipe.tags.set(tags)
         return recipe
 
     @transaction.atomic
@@ -229,18 +226,17 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         if tags is not None:
             instance.tags.set(tags)
 
-        bulk_ingredients= [
+        bulk_ingredients = [
             IngredientInRecipe(
                 recipe=instance,
                 ingredient=ingredient['id'],
                 amount=ingredient['amount']
             ) for ingredient in ingredients
-        ]            
+        ]
         IngredientInRecipe.objects.bulk_create(bulk_ingredients)
         return super().update(instance, validated_data)
 
     def validate(self, data):
-        print('RECIPE VALID: ', data)
         ingredients = data.get('ingredients')
         if not ingredients:
             raise serializers.ValidationError(
@@ -249,9 +245,9 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         ingredients_unic = set()
         for ingredient in ingredients:
             if ingredient['id'] in ingredients_unic:
-                    raise serializers.ValidationError(
-                        ERRORS['RECIPE_UNIC_INGREDIENT_VALID']
-                    )
+                raise serializers.ValidationError(
+                    ERRORS['RECIPE_UNIC_INGREDIENT_VALID']
+                )
             ingredients_unic.add(ingredient['id'])
         return data
 
@@ -266,9 +262,9 @@ class SubscriptionsSerializer(CustomUserSerializer):
             'id',
             'username',
             'first_name',
-            'last_name', 
+            'last_name',
             'is_subscribed',
-            'recipes', 
+            'recipes',
             'recipes_count',)
         model = User
 
@@ -288,4 +284,3 @@ class SubscriptionsSerializer(CustomUserSerializer):
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj).count()
-

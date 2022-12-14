@@ -36,6 +36,6 @@ FIELDS = {
     'USERS_FISRTNAME': 'Имя',
     'USERS_LASTNAME': 'Фамилия',
     'USERS_EMAIL': 'Адрес эл. почты',
-    
+
     'EMPTY': '-',
 }

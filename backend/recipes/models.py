@@ -52,14 +52,13 @@ class Tag(models.Model):
         unique=True
     )
 
-
     class Meta:
         ordering = ('name',)
         verbose_name = FIELDS['TAG_NAME']
         verbose_name_plural = FIELDS['TAGS_NAME']
 
     def __str__(self):
-        return(self.name)
+        return self.name
 
 
 class Recipe(models.Model):
@@ -79,11 +78,11 @@ class Recipe(models.Model):
         related_name='recipes'
     )
     name = models.CharField(
-        FIELDS['TITLE'], 
+        FIELDS['TITLE'],
         max_length=200
     )
     image = models.ImageField(
-        verbose_name= FIELDS['IMAGE'],
+        verbose_name=FIELDS['IMAGE'],
         upload_to='recipes-img/'
     )
     text = models.TextField(
@@ -101,7 +100,7 @@ class Recipe(models.Model):
         through='TagRecipe'
     )
     cooking_time = models.PositiveSmallIntegerField(
-        FIELDS['COOKING_TIME'], 
+        FIELDS['COOKING_TIME'],
         validators=(MinValueValidator(1),)
     )
     pub_date = models.DateTimeField(
@@ -113,7 +112,7 @@ class Recipe(models.Model):
         ordering = ('-pub_date',)
         verbose_name = FIELDS['RECIPE_NAME']
         verbose_name_plural = FIELDS['RECIPES_NAME']
-    
+
     def __str__(self):
         return self.name[:15]
 
@@ -151,7 +150,7 @@ class TagRecipe(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.tag} {self.recipe}' 
+        return f'{self.tag} {self.recipe}'
 
 
 class Favorite(models.Model):
@@ -183,7 +182,7 @@ class Favorite(models.Model):
         ]
 
     def __str__(self):
-        return(f'{self.user.username} => {self.recipe.name[:15]}')
+        return (f'{self.user.username} => {self.recipe.name[:15]}')
 
 
 class ShoppingCart(models.Model):
@@ -215,4 +214,4 @@ class ShoppingCart(models.Model):
         ]
 
     def __str__(self):
-        return(f'Список покупок {self.user} => {self.recipe.name}')
+        return (f'Список покупок {self.user} => {self.recipe.name}')

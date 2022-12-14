@@ -4,6 +4,7 @@ from django.db.models import F, Q
 
 from core.names import FIELDS
 
+
 class User(AbstractUser):
 
     email = models.EmailField(
@@ -23,12 +24,11 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ('username', 'first_name', 'last_name',)
 
-
     class Meta:
         ordering = ('username',)
         verbose_name = FIELDS['USER_NAME']
         verbose_name_plural = FIELDS['USERS_NAME']
-    
+
     def __str__(self):
         return self.username[:20]
 
@@ -66,4 +66,4 @@ class Follow(models.Model):
         ]
 
     def __str__(self):
-        return(f'{self.user} => {self.author}')
+        return (f'{self.user} => {self.author}')

@@ -36,15 +36,9 @@ class RecipeFilter(FilterSet):
         fields = ('author', 'tags', 'is_favorited', 'is_in_shopping_cart',)
 
 
-
 class IngredientFilter(FilterSet):
     name = CharFilter(field_name='name', lookup_expr='startswith')
 
     class Meta:
         model = Ingredient
         fields = ('name',)
-
-
-# def get_ingredients(request):
-#     filter = IngredientFilter(request.GET, queryset=Ingredient.objects.all())
-#     ingredients = filter.qs

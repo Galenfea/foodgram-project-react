@@ -1,22 +1,32 @@
 from django.db.models import Sum
 from django.http import HttpResponse
 from djoser.views import UserViewSet as DjoserUserViewSet
-from recipes.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
-                            ShoppingCart, Tag)
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
-from users.models import Follow, User
+
 
 from .filters import IngredientFilter, RecipeFilter
 from .mixins import CreateDeleteMixin
 from .pagination import CustomPageNumberPagination
 from .permissions import AdminOrAuthorEditOrReadOnly, AdminOrReadOnly
-from .serializers import (CustomUserSerializer, IngredientSerializer,
+from recipes.models import (Favorite,
+                            Ingredient,
+                            IngredientInRecipe,
+                            Recipe,
+                            ShoppingCart,
+                            Tag
+                            )
+from .serializers import (CustomUserSerializer,
+                          IngredientSerializer,
                           RecipeCreateUpdateSerializer,
-                          RecipeFavoriteCartSerializer, RecipeGetSerializer,
-                          SubscriptionsSerializer, TagSerializer)
+                          RecipeFavoriteCartSerializer,
+                          RecipeGetSerializer,
+                          SubscriptionsSerializer,
+                          TagSerializer
+                          )
+from users.models import Follow, User
 
 
 class RecipeViewSet(viewsets.ModelViewSet, CreateDeleteMixin):
@@ -25,20 +35,20 @@ class RecipeViewSet(viewsets.ModelViewSet, CreateDeleteMixin):
     permission_classes = (AdminOrAuthorEditOrReadOnly,)
     pagination_class = CustomPageNumberPagination
     filterset_class = RecipeFilter
-    http_method_names = ['get', 'post', 'patch', 'delete', 'options', 'headers']
+    http_method_names = ['get', 'post', 'patch',
+                         'delete', 'options', 'headers'
+                         ]
 
     def get_serializer_class(self):
-        print('ACTION = ', self.action)
-        if self.action in ('favorite','shopping_cart'):
+        if self.action in ('favorite', 'shopping_cart'):
             serializer = RecipeFavoriteCartSerializer
-        if self.action in ('create', 'delete','partial_update'):
+        if self.action in ('create', 'delete', 'partial_update'):
             serializer = RecipeCreateUpdateSerializer
         if self.request.method in SAFE_METHODS:
             serializer = RecipeGetSerializer
         return serializer
 
     def perform_create(self, serializer):
-        print('PERFORM CREATE')
         serializer.save(author=self.request.user)
 
     @action(detail=True, methods=['post', 'delete'])
@@ -46,7 +56,7 @@ class RecipeViewSet(viewsets.ModelViewSet, CreateDeleteMixin):
         """Добавление/удаление рецептов в избранном."""
         return self.create_delete(
             request=request,
-            model=Favorite, 
+            model=Favorite,
             field='recipe',
             pk=pk
         )
@@ -56,7 +66,7 @@ class RecipeViewSet(viewsets.ModelViewSet, CreateDeleteMixin):
         """Добавление/удаление рецептов в корзину."""
         return self.create_delete(
             request=request,
-            model=ShoppingCart, 
+            model=ShoppingCart,
             field='recipe',
             pk=pk
         )
@@ -85,7 +95,6 @@ class RecipeViewSet(viewsets.ModelViewSet, CreateDeleteMixin):
         return response
 
 
-
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     """Просмотри тэги списком и по-отдельности."""
 
@@ -93,6 +102,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TagSerializer
     permission_classes = (AdminOrReadOnly,)
     pagination_class = None
+
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
@@ -113,23 +123,22 @@ class UserViewSet(DjoserUserViewSet, CreateDeleteMixin):
             return SubscriptionsSerializer
         return super().get_serializer_class()
 
-
-    @action(detail=True, 
+    @action(detail=True,
             methods=['post', 'delete'],
             permission_classes=(IsAuthenticated,)
-    )
+            )
     def subscribe(self, request, id=None):
         """Добавление/удаление подписок пользователя."""
         return self.create_delete(
             request=request,
-            model=Follow, 
+            model=Follow,
             field='author',
             pk=id
         )
 
     @action(detail=False,
             permission_classes=(IsAuthenticated,)
-    )
+            )
     def subscriptions(self, request):
         user = request.user
         queryset = User.objects.filter(authors__user=user)
@@ -139,5 +148,4 @@ class UserViewSet(DjoserUserViewSet, CreateDeleteMixin):
             instance=pages,
             context={'request': request}
             )
-        print('SERIALIZER: ', serializer.data)
         return self.get_paginated_response(serializer.data)

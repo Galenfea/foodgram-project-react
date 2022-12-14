@@ -9,6 +9,7 @@ INITIAL_TAGS = [
     {'color': '#FF0075', 'name': 'Ужин', 'slug': 'dinner'},
 ]
 
+
 def read_ingredients():
     DATA_ROOT = Path(Path(settings.BASE_DIR).parent, 'data/ingredients.json')
     f = open(DATA_ROOT, 'r', encoding='utf-8')
@@ -50,6 +51,7 @@ def remove_ingredients_and_tags(apps, schema_editor):
         apps=apps, schema_editor=schema_editor,
         model='Tag', array=INITIAL_TAGS
         )
+
 
 class Migration(migrations.Migration):
 
