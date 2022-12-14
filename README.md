@@ -17,6 +17,11 @@ Web-приложение позволяет постить и просматри
 git clone https://github.com/Galenfea/foodgram-project-react
 ```
 
+- Перейти в папку проекта:
+```
+cd foodgram-project-react
+```
+
 - Создать виртуальное окружение:
 ```
 python -m venv venv
