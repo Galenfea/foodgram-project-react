@@ -8,4 +8,6 @@ ERRORS = {
     # Mixins
     'CREATE_DELETE_MIXIN_IS_RELATIONS': 'Связь между объектами уже создана.',
     'CREATE_DELETE_MIXIN_NO_RELATIONS': 'Связь между объектами отсутствует.',
+    # api/views
+    'PUT_NOT_ALLOWED': 'Метод \"PUT\" не разрешен.',
 }

@@ -6,7 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
 
-
+from core.messages import ERRORS
 from .filters import IngredientFilter, RecipeFilter
 from .mixins import CreateDeleteMixin
 from .pagination import CustomPageNumberPagination
@@ -35,9 +35,6 @@ class RecipeViewSet(viewsets.ModelViewSet, CreateDeleteMixin):
     permission_classes = (AdminOrAuthorEditOrReadOnly,)
     pagination_class = CustomPageNumberPagination
     filterset_class = RecipeFilter
-    http_method_names = ['get', 'post', 'patch',
-                         'delete', 'options', 'headers'
-                         ]
 
     def get_serializer_class(self):
         if self.action in ('favorite', 'shopping_cart'):
@@ -47,6 +44,14 @@ class RecipeViewSet(viewsets.ModelViewSet, CreateDeleteMixin):
         if self.request.method in SAFE_METHODS:
             serializer = RecipeGetSerializer
         return serializer
+
+    def update(self, request, *args, **kwargs):
+        if request.method == 'PUT':
+            response = {'detail': ERRORS['PUT_NOT_ALLOWED']}
+            return Response(response,
+                            status=status.HTTP_405_METHOD_NOT_ALLOWED
+                            )
+        return super().update(request, *args, **kwargs)
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
