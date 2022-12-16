@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'colorfield',
     'django_filters',
-    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -160,6 +159,3 @@ DJOSER = {
         'user': ['djoser.permissions.CurrentUserOrAdminOrReadOnly'],
     },
 }
-
-
-CORS_ALLOW_ALL_ORIGINS = True
