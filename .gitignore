@@ -134,3 +134,4 @@ dmypy.json
 requests.http
 backend/static
 backend/media/*
+.vscode
