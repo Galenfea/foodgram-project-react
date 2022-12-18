@@ -89,7 +89,8 @@ class RecipeViewSet(viewsets.ModelViewSet, CreateDeleteMixin):
         ingredients = IngredientInRecipe.objects.filter(
             recipe__in_shopping_cart__user=request.user
         ).values_list(
-            'ingredient__name', 'ingredient__measurement_unit'
+            'ingredient__name',
+            'ingredient__measurement_unit'
         ).annotate(ingredient_amount=Sum('amount'))
         shoppinglist = '\n'.join([f'- {ingredient[0]} - '
                                   f'{ingredient[2]} '

@@ -15,10 +15,16 @@ from users.models import Follow, User
 class CustomUserCreateSerializer(UserCreateSerializer):
     class Meta:
         model = User
-        fields = ('email', 'password', 'username', 'first_name', 'last_name',)
+        fields = (
+            'email',
+            'password',
+            'username',
+            'first_name',
+            'last_name',
+        )
 
     def validate_username(self, value):
-        if value == "me":
+        if value.lower() == "me":
             raise ValidationError(
                 ERRORS['USER_ME_VALID']
             )
@@ -29,10 +35,14 @@ class CustomUserSerializer(UserSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
-        fields = ('email', 'id', 'username',
-                  'first_name', 'last_name',
-                  'is_subscribed',
-                  )
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed',
+        )
         model = User
 
     def get_is_subscribed(self, obj):
@@ -98,12 +108,12 @@ class TagRecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = TagRecipe
         fields = ('recipe', 'tag',)
-        validators = [
+        validators = (
             UniqueTogetherValidator(
                 queryset=IngredientInRecipe.objects.all(),
                 fields=['recipe', 'tag']
-            )
-        ]
+            ),
+        )
 
 
 class RecipeGetSerializer(serializers.ModelSerializer):
@@ -200,20 +210,22 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         # получаю список словарей с ингредиентами и их количеством
-        ingredients = validated_data.pop('ingredients')
-        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients', False)
+        tags = validated_data.pop('tags', False)
         recipe = Recipe.objects.create(**validated_data)
         # создаю связку между рецептом и ингредиентами
-        bulk_ingredients = [
-            IngredientInRecipe(
-                recipe=recipe,
-                ingredient=ingredient['id'],
-                amount=ingredient['amount']
-            ) for ingredient in ingredients
-        ]
-        IngredientInRecipe.objects.bulk_create(bulk_ingredients)
+        if ingredients:
+            bulk_ingredients = [
+                IngredientInRecipe(
+                    recipe=recipe,
+                    ingredient=ingredient['id'],
+                    amount=ingredient['amount']
+                ) for ingredient in ingredients
+            ]
+            IngredientInRecipe.objects.bulk_create(bulk_ingredients)
         # добавляю тэги
-        recipe.tags.set(tags)
+        if tags:
+            recipe.tags.set(tags)
         return recipe
 
     @transaction.atomic

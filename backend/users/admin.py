@@ -13,13 +13,27 @@ class UserAdmin(admin.ModelAdmin):
     - проводить поиск и фильтровать по имени пользователя,
     имени, и фамилии;
     - выводить "-пусто-" в полях со значением None."""
-    list_display = ('pk', 'email', 'username', 'is_active',
-                    'first_name', 'last_name',
-                    )
-    list_editable = ('email', 'username', 'is_active',
-                     'first_name', 'last_name',
-                     )
-    search_fields = ('email', 'username', 'first_name', 'last_name',)
+    list_display = (
+        'pk',
+        'email',
+        'username',
+        'is_active',
+        'first_name',
+        'last_name',
+    )
+    list_editable = (
+        'email',
+        'username',
+        'is_active',
+        'first_name',
+        'last_name',
+    )
+    search_fields = (
+        'email',
+        'username',
+        'first_name',
+        'last_name',
+    )
     list_filter = ('email', 'username',)
     empty_value_display = FIELDS['EMPTY']
 
