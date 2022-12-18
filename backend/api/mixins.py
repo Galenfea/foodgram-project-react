@@ -4,11 +4,12 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
+from rest_framework.generics import GenericAPIView
 
 from core.messages import ERRORS
 
 
-class CreateDeleteMixin:
+class CreateDeleteMixin(GenericAPIView):
     '''Миксин класс для добавления и удаления объектов в таблицах m2m.'''
     def create_delete(self, request, model, field, pk=None):
         object = get_object_or_404(self.queryset, pk=pk)
@@ -23,7 +24,7 @@ class CreateDeleteMixin:
                 raise ValidationError(
                     ERRORS['CREATE_DELETE_MIXIN_IS_RELATIONS']
                 )
-            # Методы будут доступны в классе, наследуемом от ModelViewSet
+            # Методы наследуются от GenericAPIView
             serializer_class = self.get_serializer_class()
             context = self.get_serializer_context()
             serializer = serializer_class(object, context=context)

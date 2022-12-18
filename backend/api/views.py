@@ -1,5 +1,3 @@
-from django.db.models import Sum
-from django.http import HttpResponse
 from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -13,7 +11,6 @@ from .pagination import CustomPageNumberPagination
 from .permissions import AdminOrAuthorEditOrReadOnly, AdminOrReadOnly
 from recipes.models import (Favorite,
                             Ingredient,
-                            IngredientInRecipe,
                             Recipe,
                             ShoppingCart,
                             Tag
@@ -28,6 +25,7 @@ from .serializers import (CustomUserSerializer,
                           )
 from users.models import Follow, User
 from .service import create_pdf_shopping_list
+
 
 class RecipeViewSet(viewsets.ModelViewSet, CreateDeleteMixin):
     queryset = Recipe.objects.all()
