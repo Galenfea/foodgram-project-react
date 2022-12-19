@@ -4,7 +4,7 @@ services:
     image: postgres:13.0-alpine
 
     volumes:
-      - /var/lib/postgresql/data/
+      - db_volume:/var/lib/postgresql/data/
 
     env_file:
       - ./.env
@@ -15,20 +15,19 @@ services:
     restart: always
     
     volumes:
-      - static_value:/app/static/
-      - media_value:/app/media/
+      - static_volume:/app/static/
+      - media_volume:/app/media/
 
     depends_on:
       - db
 
     env_file:
       - ./.env
+    command: bash -c "python manage.py migrate && python manage.py collectstatic && gunicorn foodgram.wsgi:application --bind 0:8000"
 
 
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    image: galenfea/foodgram_frontend:latest
     volumes:
       - ../frontend/:/app/result_build/
 
@@ -43,16 +42,17 @@ services:
       - "80:80"
 
     volumes:
-      - static_value:/var/html/static/
-      - media_value:/var/html/media/
+      - static_volume:/var/html/static/
+      - media_volume:/var/html/media/
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend/build:/usr/share/nginx/html/
       - ../docs/:/usr/share/nginx/html/api/docs/
 
     depends_on:
       - frontend
+      - backend
 
-
-  volumes:
-  static_value:
-  media_value:
+volumes:
+  static_volume:
+  media_volume:
+  db_volume:
