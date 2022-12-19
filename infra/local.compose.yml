@@ -1,9 +1,0 @@
-services:
-  db:
-    posrts: 
-      - 5432:5432
-
-  backend:
-    posrts: 
-      - 5432:5432
-
