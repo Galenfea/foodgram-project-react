@@ -13,9 +13,9 @@ services:
     image: galenfea/foodgram_backend:latest
     restart: on-failure
 
-    volumes:
-      - static_volume:/app/static/
-      - media_volume:/app/media/
+    # volumes:
+    #   - static_volume:/app/static/
+    #   - media_volume:/app/media/
 
     depends_on:
       - db
