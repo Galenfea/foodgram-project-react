@@ -11,7 +11,9 @@ services:
 
 
   backend:
-    image: galenfea/foodgram_backend:latest
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
     restart: always
     
     volumes:
@@ -23,11 +25,13 @@ services:
 
     env_file:
       - ./.env
-
+    command: bash -c "python manage.py migrate && python manage.py collectstatic && gunicorn foodgram.wsgi:application --bind 0:8000"
 
 
   frontend:
-    image: galenfea/foodgram_frontend:latest
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
     volumes:
       - ../frontend/:/app/result_build/
 
@@ -50,6 +54,7 @@ services:
 
     depends_on:
       - frontend
+      - backend
 
 volumes:
   static_volume:
