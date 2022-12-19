@@ -138,5 +138,5 @@ class UserViewSet(DjoserUserViewSet, CreateDeleteMixin):
             many=True,
             instance=pages,
             context={'request': request}
-            )
+        )
         return self.get_paginated_response(serializer.data)
