@@ -13,11 +13,11 @@ def create_pdf_shopping_list(request):
 
     pdf = FPDF(orientation='P', unit='mm', format='A5')
     pdf.add_page()
-    FONT_FULL_NAME = Path(
+    font_full_name = Path(
         Path(settings.BASE_DIR).parent,
         'data/DejaVuSansCondensed.ttf'
     )
-    pdf.add_font(family='DejaVu', style='', fname=FONT_FULL_NAME, uni=True)
+    pdf.add_font(family='DejaVu', style='', fname=font_full_name, uni=True)
 
     ingredients = IngredientInRecipe.objects.filter(
         recipe__in_shopping_cart__user=request.user
@@ -40,7 +40,10 @@ def create_pdf_shopping_list(request):
      ]
 
     filename = 'shoppinglist.pdf'
-    response = HttpResponse(pdf.output(dest='S').encode('latin-1'), content_type='application/pdf')
+    response = HttpResponse(
+        pdf.output(dest='S').encode('latin-1'),
+        content_type='application/pdf'
+    )
     response['Content-Disposition'] = ('attachment;'
                                        f'filename={filename}')
     return response
