@@ -8,4 +8,4 @@ COPY . ./
 
 RUN pip3 install -r ./requirements.txt --no-cache-dir
 
-CMD [ "python", "manage.py", "migrate" ]
+CMD [ "gunicorn", "foodgram.wsgi:application", "--bind", "0:8000"]
