@@ -1,5 +1,3 @@
-from django.db.models import Sum
-from django.http import HttpResponse
 from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -13,7 +11,6 @@ from .pagination import CustomPageNumberPagination
 from .permissions import AdminOrAuthorEditOrReadOnly, AdminOrReadOnly
 from recipes.models import (Favorite,
                             Ingredient,
-                            IngredientInRecipe,
                             Recipe,
                             ShoppingCart,
                             Tag
@@ -27,6 +24,7 @@ from .serializers import (CustomUserSerializer,
                           TagSerializer
                           )
 from users.models import Follow, User
+from .service import create_pdf_shopping_list
 
 
 class RecipeViewSet(viewsets.ModelViewSet, CreateDeleteMixin):
@@ -85,22 +83,7 @@ class RecipeViewSet(viewsets.ModelViewSet, CreateDeleteMixin):
         user = self.request.user
         if user.is_anonymous:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
-
-        ingredients = IngredientInRecipe.objects.filter(
-            recipe__in_shopping_cart__user=request.user
-        ).values_list(
-            'ingredient__name', 'ingredient__measurement_unit'
-        ).annotate(ingredient_amount=Sum('amount'))
-        shoppinglist = '\n'.join([f'- {ingredient[0]} - '
-                                  f'{ingredient[2]} '
-                                  f'{ingredient[1]}'
-                                  for ingredient in ingredients]
-                                 )
-        filename = 'shoppinglist.txt'
-        response = HttpResponse(shoppinglist, content_type='text/plain')
-        response['Content-Disposition'] = ('attachment;'
-                                           f'filename={filename}')
-        return response
+        return create_pdf_shopping_list(request)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):

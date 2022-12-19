@@ -135,3 +135,4 @@ requests.http
 backend/static
 backend/media/*
 .vscode/
+.vscode/*
