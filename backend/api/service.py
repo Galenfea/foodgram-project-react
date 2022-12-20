@@ -15,7 +15,7 @@ def create_pdf_shopping_list(request):
     pdf = FPDF(orientation='P', unit='mm', format='A5')
     pdf.add_page()
     font_full_name = Path(
-        Path(settings.BASE_DIR).parent,
+        Path(settings.BASE_DIR),
         'data/DejaVuSansCondensed.ttf'
     )
     pdf.add_font(family='DejaVu', style='', fname=font_full_name, uni=True)
@@ -25,7 +25,7 @@ def create_pdf_shopping_list(request):
     ).values_list(
         'ingredient__name',
         'ingredient__measurement_unit'
-    ).annotate(ingredient_amount=Sum('amount'))
+    ).annotate(ingredient_amount=Sum('amount')).order_by('ingredient__name')
     pdf.set_font('DejaVu', '', 18)
     pdf.cell(75)
     pdf.cell(h=0, w=15, txt='Список покупок', align='R', ln=2)

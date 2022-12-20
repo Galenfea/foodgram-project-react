@@ -11,7 +11,7 @@ INITIAL_TAGS = [
 
 
 def read_ingredients():
-    DATA_ROOT = Path(Path(settings.BASE_DIR).parent, 'data/ingredients.json')
+    DATA_ROOT = Path(Path(settings.BASE_DIR), 'data/ingredients.json')
     f = open(DATA_ROOT, 'r', encoding='utf-8')
     ingredients = f.read()
     f.close()
