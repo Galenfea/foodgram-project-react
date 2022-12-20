@@ -28,7 +28,7 @@ services:
   frontend:
     image: galenfea/foodgram_backend:latest
     volumes:
-      - ./foodgram-project-react/frontend/static/:/app/result_build/
+      - ./foodgram-project-react/frontend/:/app/result_build/
   
   nginx:
     image: nginx:1.23.3
