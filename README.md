@@ -1,77 +1,123 @@
-
-# ВНИМАНИЕ
-В проекте присутствует библиотека django-cors-headers
-Она активна для удобства проверки проекта на локальной машине.
-На этапе создания инфраструктуры она будет удалена.
-
-В данный момент проект использует sqlite. 
-На инфраструктурном этапе субд будет заменена на PostgreSQL.
-
 # FOODGRAM
 Web-приложение позволяет постить и просматривать рецепты, формировать список покупок из ингридиентов в составе рецептов.
 
-## Установка проекта
+# YAMDB_FINAL
+![Foodgram-project-react-app_workflow](https://github.com/Galenfea/foodgram-project-react/actions/workflows/foodgram-project-react.yml/badge.svg)
 
-- Клонировать репозиторий:
-```
-git clone https://github.com/Galenfea/foodgram-project-react
-```
+Предназначен для хранения и обмена рецепта, обеспечен CI:
 
-- Перейти в папку проекта:
-```
-cd foodgram-project-react
-```
-
-- Создать виртуальное окружение:
-```
-python -m venv venv
-```
-
-- Активировать виртуальное окружение:
-```
-source venv/Scripts/activate
-```
-
-- Обновить установщик:
-```
-python -m pip install --upgrade pip
-```
-
-- Установить зависимости:
-```
-pip install -r requirements.txt
-```
-
-- Перейти в папку джанго сервера:
-```
-cd backend
-```
-
-- Выполнить миграции:
-```
-python manage.py migrate
-```
-
-- Создать суперпользователя:
-```
-python manage.py createsuperuser
-```
-
-## Документация к API
-Доступна по следующему адресу после запуска сервера (адрес указан для dev-режима)
-```
-http://127.0.0.1/api/docs/
-```
-
+- интерфейс реализован через REST API и web-страницы на react;
+- есть регистрация и авторизация пользователей;
+- добавление, редактирование и удаление рецептов;
+- добавление рецептов в избранное и подписка на авторов;
+- рецептам можно присваивать тэги, создаваемые администратором;
+- разделение ролей на пользователей, модераторов и администраторов;
+- модераторы и администраторы могут добавлять произведения, новые жанры и новые категории;
+- при push в мастер ветку проводится тестирование на pep-8.
 
 ## Применяемые технологии:
 
-- Python 3.7
-- Django==4.1
-- Pillow==9.2.0
-- sorl-thumbnail==12.8.0
+- Python 3.10
+- Django 4.1
+- Django Rest Framework 3.13.1
+- Docker 3.8
+- Postgres 13.0
+- Continuous Integration
+- Continuous Deployment
 
-## Пример создания пользователя через POST запрос:
+## Как запустить проект:
+
+**На Windows 10 корпоративной:**
+
+***Если у вас не установлен Docker:***
+- _откройте: Панель управления — Программы и компоненты — Включение и отключение компонентов Windows;_
+- _активируйте пункт Hyper-V;_
+- _перезагрузите систему._
+
+_Установите Docker Desctop:_
+[Docker Desctop для Windows](https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe?utm_source=docker&utm_medium=webreferral&utm_campaign=dd-smartbutton&utm_location=header)
+
+***Если у вас уже установлен Docker***
+
+_Клонируйте репозиторий:_
+```
+git clone https://github.com/Galenfea/foodgram-project-react.git
+```
+
+_Перейдите в репозиторий в командной строке:_
+```
+cd foodgram-project-react/infra
+```
+
+_Создайте файл .env:_
+```
+touch .env
+```
+
+_Скопируйте в него следующий шаблон и установить собственные значения:_
+```
+DB_ENGINE=django.db.backends.postgresql 
+DB_NAME=postgres 
+POSTGRES_USER=postgres 
+POSTGRES_PASSWORD=postgres 
+DB_HOST=db 
+DB_PORT=5432
+WEB_SECRET_KEY='your_secret_key' # ваш секретный ключ
+WEB_ALLOWED_HOSTS==127.0.0.1 localhost <ваш ip сервер, если разворачиваете на сервере>
+```
+
+_Соберите необходимые образы:_
+- для развёртывания на локальной машине:
+```
+docker-compose -f local-docker-compose.yml up -d
+```
+- для развёртывания на сервере:
+```
+docker-compose up -d
+```
+
+_Загрузите тестовые данные в базу:_
+```
+ winpty docker-compose exec <infra_backend_1>* python manage.py loaddata fixtures.json
+```
+* *название контейнера с бэкендом*
+
+_Откройте админку на локальной машине:_
+```
+http://127.0.0.1/admin/
+```
+
+## Документация
+После запуска автономного сервера документация API расположена по ардесу:
+
+http://127.0.0.1/redoc/
+
+
+## Адрес сервера для деплоя в рамках CI/CD:
+
+http://158.160.26.27/api/docs/ - документация по API
+
+http://158.160.26.27/admin/ - вход в админку
+
+
+_Тестовый суперпользователь:_
+```
+email: admin@admin.com
+password: admin
+```
+
+
+## Примеры запросов:
+
+## Авторы:
+
+- ***Отаров Александр*** -- вся внутренняя часть, REST API, упаковка в Docker, CI/CD; 
+- Яндекс -- вэб-интерфейс сайта.
+
+
+# Примеры POST запросов, для экономии времени:
+
+## Создание пользователя:
 ```
 {
 "email": "cepesh@yandex.ru",
@@ -82,7 +128,7 @@ http://127.0.0.1/api/docs/
 }
 ```
 
-## Пример получения токена авторизации через POST запрос:
+## Получение токена авторизации:
 ```
 {
 "password": "123098QwePoi",
@@ -90,7 +136,7 @@ http://127.0.0.1/api/docs/
 }
 ```
 
-## Пример создания рецепта через POST запрос:
+## Создание рецепта:
 ```
 {
   "ingredients": [
