@@ -137,3 +137,4 @@ backend/media/*
 .vscode/
 .vscode/*
 /infra/local-image-docker-compose.yml
+# push
