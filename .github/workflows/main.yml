@@ -78,6 +78,9 @@ jobs:
             echo DB_PORT=${{ secrets.DB_PORT }} >> .env
             echo WEB_ALLOWED_HOSTS=${{ secrets.WEB_ALLOWED_HOSTS }} >> .env
             echo WEB_SECRET_KEY=${{ secrets.WEB_SECRET_KEY }} >> .env
+            DJANGO_SUPERUSER_PASSWORD=${{ secrets.DJANGO_SUPERUSER_PASSWORD }} >> .env
+            DJANGO_SUPERUSER_USERNAME=${{ secrets.DJANGO_SUPERUSER_USERNAME }} >> .env
+            DJANGO_SUPERUSER_EMAIL=${{ secrets.DJANGO_SUPERUSER_EMAIL }} >> .env
             sudo docker-compose up -d
 
   send_message:
