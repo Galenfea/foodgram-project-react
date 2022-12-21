@@ -18,7 +18,9 @@ services:
     depends_on:
       - db
     command: >
-      bash -c "python manage.py migrate && python manage.py collectstatic
+      bash -c "python manage.py migrate
+      && python manage.py loaddata ../data/fixtures.json      
+      && python manage.py collectstatic
       &&  gunicorn foodgram.wsgi:application --bind 0:8000"
 
   frontend:
