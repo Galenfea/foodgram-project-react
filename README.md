@@ -100,6 +100,11 @@ email: admin@admin.com
 password: admin
 ```
 
+_Тестовый ползователь:_
+```
+email: cepesh@yandex.ru
+password: 123098QwePoi
+```
 
 ## Примеры запросов:
 
