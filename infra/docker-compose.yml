@@ -19,7 +19,7 @@ services:
       - db
     command: >
       bash -c "python manage.py migrate
-      && python manage.py createsuperuser --noinput
+      && python manage.py createsuperuser --first_name Admin --last_name Adminsky --noinput
       && python manage.py collectstatic
       && gunicorn foodgram.wsgi:application --bind 0:8000"
 
