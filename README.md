@@ -76,12 +76,6 @@ docker-compose -f local-docker-compose.yml up -d
 docker-compose up -d
 ```
 
-_Загрузите тестовые данные в базу:_
-```
- winpty docker-compose exec <infra_backend_1>* python manage.py loaddata fixtures.json
-```
-* *название контейнера с бэкендом*
-
 _Откройте админку на локальной машине:_
 ```
 http://127.0.0.1/admin/
