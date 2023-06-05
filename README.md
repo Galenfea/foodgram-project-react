@@ -2,7 +2,6 @@
 Web-приложение позволяет постить и просматривать рецепты, формировать список покупок из ингридиентов в составе рецептов.
 
 # YAMDB_FINAL
-![Foodgram-project-react-app_workflow](https://github.com/Galenfea/foodgram-project-react/actions/workflows/foodgram-project-react.yml/badge.svg)
 
 Предназначен для хранения и обмена рецепта, обеспечен CI:
 
